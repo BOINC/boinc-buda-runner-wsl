@@ -1,0 +1,26 @@
+name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        if: success()
+        run: |
+          ./build.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: boinc-buda-runner.wsl
+          path: ./boinc-buda-runner.wsl
