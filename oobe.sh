@@ -18,6 +18,21 @@ apk add --no-cache ca-certificates
 update-ca-certificates
 echo "Certificates setup complete"
 
+echo "Fixing cgroups..."
+apk add --no-cache openrc
+sed -i 's/^#rc_cgroup_mode="unified"/rc_cgroup_mode="unified"/' /etc/rc.conf
+rc-update add cgroups
+echo "cgroups fixed"
+
+echo "Fixing permissions..."
+chmod 1777 /var/tmp
+echo "Permissions fixed"
+
+echo "Setting version..."
+echo "version: 2" > /home/$DEFAULT_USER/version.txt
+chown $DEFAULT_USER:$DEFAULT_USER /home/$DEFAULT_USER/version.txt
+echo "Version set"
+
 echo "Setting up podman..."
 apk add --no-cache podman
 modprobe tun
