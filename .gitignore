@@ -1,1 +1,3 @@
 boinc-buda-runner.wsl
+# Vim swap files
+*.swp
