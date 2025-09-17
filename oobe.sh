@@ -29,7 +29,7 @@ chmod 1777 /var/tmp
 echo "Permissions fixed"
 
 echo "Setting version..."
-echo "version: 2" > /home/$DEFAULT_USER/version.txt
+echo "version: 3" > /home/$DEFAULT_USER/version.txt
 chown $DEFAULT_USER:$DEFAULT_USER /home/$DEFAULT_USER/version.txt
 echo "Version set"
 
