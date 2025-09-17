@@ -1,3 +1,20 @@
+# This file is part of BOINC.
+# https://boinc.berkeley.edu
+# Copyright (C) 2025 University of California
+#
+# BOINC is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# BOINC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with BOINC.  If not, see <http://www.gnu.org/licenses/>.
+
 name: Build
 on:
   push:
@@ -9,6 +26,9 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [ x86_64, aarch64 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,11 +36,11 @@ jobs:
       - name: Build
         if: success()
         run: |
-          ./build.sh
+          ./build.sh ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: boinc-buda-runner.wsl
-          path: ./boinc-buda-runner.wsl
+          name: boinc-buda-runner-${{ matrix.arch }}.wsl
+          path: ./boinc-buda-runner-${{ matrix.arch }}.wsl
