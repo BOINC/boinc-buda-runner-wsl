@@ -35,6 +35,10 @@ apk add --no-cache ca-certificates
 update-ca-certificates
 echo "Certificates setup complete"
 
+echo "Installing iptables..."
+apk add --no-cache iptables
+echo "iptables installed"
+
 echo "Fixing cgroups..."
 apk add --no-cache openrc
 sed -i 's/^#rc_cgroup_mode="unified"/rc_cgroup_mode="unified"/' /etc/rc.conf
@@ -46,7 +50,7 @@ chmod 1777 /var/tmp
 echo "Permissions fixed"
 
 echo "Setting version..."
-echo "version: 3" > /home/$DEFAULT_USER/version.txt
+echo "version: 4" > /home/$DEFAULT_USER/version.txt
 chown $DEFAULT_USER:$DEFAULT_USER /home/$DEFAULT_USER/version.txt
 echo "Version set"
 
