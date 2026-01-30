@@ -1,6 +1,20 @@
+# One-Click Installer for BOINC BUDA Runner
+
+1. Download latest release from https://github.com/BOINC/boinc-buda-runner-wsl-installer/releases
+2. Navigate to the directory where you downloaded the release
+3. Double-click on the `boinc-buda-runner-wsl-installer.exe` file
+4. Follow the instructions in the installer
+
+# One-Click Upgrade for BOINC BUDA Runner
+
+1. Download latest release from https://github.com/BOINC/boinc-buda-runner-wsl-installer/releases
+2. Navigate to the directory where you downloaded the release
+3. Double-click on the `boinc-buda-runner-wsl-installer.exe` file
+4. Follow the instructions in the installer
+
 # Installation
 
-1. Follow instruction to enable WSL https://learn.microsoft.com/en-us/windows/wsl/install
+1. Follow instructions to enable WSL https://learn.microsoft.com/en-us/windows/wsl/install
 2. Enable WSL2 (currently only WSL2 is supported)
 3. Download latest release from https://github.com/BOINC/boinc-buda-runner-wsl/releases
 4. Navigate to the directory where you downloaded the release
