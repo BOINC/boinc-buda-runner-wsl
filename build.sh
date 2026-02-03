@@ -2,7 +2,7 @@
 
 # This file is part of BOINC.
 # https://boinc.berkeley.edu
-# Copyright (C) 2025 University of California
+# Copyright (C) 2026 University of California
 #
 # BOINC is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License
@@ -34,6 +34,7 @@ cp ./wsl.conf ./alpine/etc/
 mkdir -p ./alpine/usr/lib/wsl
 cp ./boinc.ico ./alpine/usr/lib/wsl/
 cp ./terminal-profile.json ./alpine/usr/lib/wsl/
+echo "tmpfs /tmp tmpfs defaults,noatime,mode=1777,size=50% 0 0" >> ./alpine/etc/fstab
 
 cd alpine
 tar --numeric-owner --absolute-names -c  * | gzip --best > ../install.tar.gz
