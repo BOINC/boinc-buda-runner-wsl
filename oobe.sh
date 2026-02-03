@@ -2,7 +2,7 @@
 
 # This file is part of BOINC.
 # https://boinc.berkeley.edu
-# Copyright (C) 2025 University of California
+# Copyright (C) 2026 University of California
 #
 # BOINC is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License
@@ -50,7 +50,7 @@ chmod 1777 /var/tmp
 echo "Permissions fixed"
 
 echo "Setting version..."
-echo "version: 4" > /home/$DEFAULT_USER/version.txt
+echo "version: 5" > /home/$DEFAULT_USER/version.txt
 chown $DEFAULT_USER:$DEFAULT_USER /home/$DEFAULT_USER/version.txt
 echo "Version set"
 
