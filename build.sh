@@ -17,27 +17,73 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with BOINC.  If not, see <http://www.gnu.org/licenses/>.
 
+# This script is heavily based on the https://salsa.debian.org/debian/WSL/-/raw/master/create-targz.sh script, which is licensed under the MIT License.
+
 set -e
 
-arch=$1
+BUILDIR=$(pwd)
+ROOTFSDIR="$BUILDIR/rootfs"
+mkdir -p "$ROOTFSDIR"
+TMPDIR_X64=$(mktemp -d -p "$ROOTFSDIR")
+TMPDIR_ARM64=$(mktemp -d -p "$ROOTFSDIR")
 
-url="https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/${arch}/alpine-minirootfs-3.22.1-${arch}.tar.gz"
+DIST="trixie"
 
-curl -L $url -o alpine.tar.gz
-mkdir -p alpine
-tar -xzf alpine.tar.gz -C alpine --strip-components=1
-rm alpine.tar.gz
+cleanup() {
+    rm -rf "$ROOTFSDIR"
+}
+trap cleanup EXIT
 
-cp ./oobe.sh ./alpine/etc/
-cp ./wsl-distribution.conf ./alpine/etc/
-cp ./wsl.conf ./alpine/etc/
-mkdir -p ./alpine/usr/lib/wsl
-cp ./boinc.ico ./alpine/usr/lib/wsl/
-cp ./terminal-profile.json ./alpine/usr/lib/wsl/
-echo "tmpfs /tmp tmpfs defaults,noatime,mode=1777,size=50% 0 0" >> ./alpine/etc/fstab
+create_rootfs() {
+    local target_arch="$1"
+    local debian_arch tmpdir
 
-cd alpine
-tar --numeric-owner --absolute-names -c  * | gzip --best > ../install.tar.gz
-cd ..
-rm -rf alpine
-mv install.tar.gz boinc-buda-runner-${arch}.wsl
+    case "$target_arch" in
+        x86_64)
+            debian_arch="amd64"
+            tmpdir="$TMPDIR_X64"
+            ;;
+        aarch64)
+            debian_arch="arm64"
+            tmpdir="$TMPDIR_ARM64"
+            ;;
+        *)
+            echo "Unknown architecture: $target_arch" >&2
+            return 1
+            ;;
+    esac
+
+    cd "$tmpdir"
+
+    mmdebstrap --arch "$debian_arch" --include=sudo,locales,libpam-systemd,dbus,ca-certificates "$DIST" "$DIST" "$BUILDIR/debian.sources"
+    chroot "$DIST" apt-get clean
+    chroot "$DIST" /bin/bash -c "echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen"
+    chroot "$DIST" /bin/bash -c "update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8"
+    cp "$BUILDIR/wsl-distribution.conf" "$tmpdir/$DIST/etc/wsl-distribution.conf"
+    cp "$BUILDIR/wsl.conf" "$tmpdir/$DIST/etc/wsl.conf"
+    mkdir -p "$tmpdir/$DIST/usr/lib/wsl/"
+    cp "$BUILDIR/oobe.sh" "$tmpdir/$DIST/etc/oobe.sh"
+    chmod 755 "$tmpdir/$DIST/etc/oobe.sh"
+    cp "$BUILDIR/boinc.ico" "$tmpdir/$DIST/usr/lib/wsl/boinc.ico"
+    cp "$BUILDIR/terminal-profile.json" "$tmpdir/$DIST/usr/lib/wsl/"
+    mkdir -p "$tmpdir/$DIST/etc/containers"
+    cp "$BUILDIR/containers.conf" "$tmpdir/$DIST/etc/containers/containers.conf"
+    rm -f "$tmpdir/$DIST/etc/resolv.conf"
+
+    cd "$DIST"
+    tar --numeric-owner --absolute-names -c  * | gzip --best > "$tmpdir/install.tar.gz"
+    mv -f "$tmpdir/install.tar.gz" "$BUILDIR/boinc-buda-runner-${target_arch}.wsl"
+}
+
+case "$1" in
+    x86_64)
+        create_rootfs "x86_64"
+        ;;
+    aarch64)
+        create_rootfs "aarch64"
+        ;;
+    *)
+        echo "Usage: $0 [x86_64|aarch64]" >&2
+        exit 1
+        ;;
+esac
