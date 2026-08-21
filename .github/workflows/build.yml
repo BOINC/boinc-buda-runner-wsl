@@ -1,6 +1,6 @@
 # This file is part of BOINC.
 # https://boinc.berkeley.edu
-# Copyright (C) 2025 University of California
+# Copyright (C) 2026 University of California
 #
 # BOINC is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License
@@ -25,10 +25,16 @@ on:
 jobs:
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        arch: [ x86_64, aarch64 ]
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+            platform: linux/amd64
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            platform: linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +42,8 @@ jobs:
       - name: Build
         if: success()
         run: |
-          ./build.sh ${{ matrix.arch }}
+          docker build . -t wsl-builder --platform ${{ matrix.platform }}
+          docker run --rm -v ${{ github.workspace }}:/app wsl-builder /app/build.sh ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

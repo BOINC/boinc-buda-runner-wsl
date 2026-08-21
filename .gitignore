@@ -1,3 +1,5 @@
 boinc-buda-runner.wsl
 # Vim swap files
 *.swp
+# build artifacts
+*.wsl
